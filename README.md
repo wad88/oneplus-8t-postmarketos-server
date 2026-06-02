@@ -1,4 +1,8 @@
-# OnePlus 8T → postmarketOS 自托管服务器
+<p align="center">
+  <img src="assets/logo.svg" width="160" alt="oneplus-8t postmarketOS server logo">
+</p>
+
+<h1 align="center">OnePlus 8T → postmarketOS 自托管服务器</h1>
 
 把一台退役的 **一加 8T（KB2000，代号 kebab，骁龙 865 / SM8250，12+256G）** 刷成
 **postmarketOS（纯 mainline Linux，不是 Android）**，做成 24×7 的 ARM Linux 自托管服务器：
