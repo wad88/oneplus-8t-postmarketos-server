@@ -1,0 +1,9 @@
+#!/sbin/openrc-run
+name="hermes-screen"
+description="Hermes status screen on tty0"
+command="/usr/local/bin/hermes-screen.sh"
+command_background=true
+pidfile="/run/hermes-screen.pid"
+output_log="/tmp/hermes-screen.log"
+error_log="/tmp/hermes-screen.log"
+depend() { after docker; }

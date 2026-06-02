@@ -1,0 +1,20 @@
+# Hermes 监控自启 —— systemd timer 版（容器内是 systemd 时优先用这个）
+# 放到 /etc/systemd/system/ 下，然后：
+#   systemctl daemon-reload
+#   systemctl enable --now hermes-monitor.timer
+#   systemctl list-timers | grep hermes   # 查看下次触发
+
+# ---------- /etc/systemd/system/hermes-monitor.service ----------
+[Unit]
+Description=Hermes health check + IM card push
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# 把 secrets 放这个 env 文件，权限 600，不进版本库
+EnvironmentFile=-/etc/hermes/hermes.env
+ExecStart=/opt/hermes/hermes-monitor.sh
+# 防止巡检本身吃资源
+Nice=10
+IOSchedulingClass=idle

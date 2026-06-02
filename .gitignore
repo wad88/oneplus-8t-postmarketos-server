@@ -1,0 +1,29 @@
+# 镜像/二进制 — 绝不入库
+*.img
+*.dtb
+*.dtbo
+*.tar.gz
+*.tar.xz
+*.zip
+backup-stock/
+patched-boot/
+fastboot-readback-fw/
+cache/
+
+# 日志/设备指纹原始输出
+logs/
+*.log
+kb2000-*.txt
+*-dmesg.txt
+
+# 真实配置(只提交 .example)
+hermes.env
+hermes-status.conf
+*.secret
+
+# Python
+__pycache__/
+*.pyc
+
+# 临时调试脚本
+*.ps1

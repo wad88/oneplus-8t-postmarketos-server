@@ -1,0 +1,57 @@
+name: hermes-stack
+
+# 一加8T-Hermes 基础服务栈
+# 在容器内 Ubuntu 装好 docker + docker compose 后：docker compose up -d
+# 资源限制是关键 —— 8/12G 手机，必须给每个容器限内存，否则 OOM 会把整机拖垮
+
+services:
+  # ---- 智能家居中枢（图里的 homeassistant:8123）----
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: homeassistant
+    restart: unless-stopped
+    # HA 需要 host 网络才能发现局域网设备（mDNS/SSDP）
+    network_mode: host
+    volumes:
+      - ./ha-config:/config
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - TZ=Asia/Shanghai
+    mem_limit: 1500m
+    mem_reservation: 512m
+    # HA 占用偏大，手机上盯着点
+
+  # ---- 推送通道：自建 ntfy（不想用公共 ntfy.sh 时自托管）----
+  ntfy:
+    image: binwiederhier/ntfy:latest
+    container_name: ntfy
+    command: serve
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./ntfy-cache:/var/cache/ntfy
+      - ./ntfy-etc:/etc/ntfy
+    environment:
+      - NTFY_BASE_URL=http://127.0.0.1:8080
+      - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
+      - TZ=Asia/Shanghai
+    mem_limit: 128m
+
+  # ---- 可选：Uptime Kuma 可视化探活（比脚本更直观，但更吃内存）----
+  # uptime-kuma:
+  #   image: louislam/uptime-kuma:1
+  #   container_name: uptime-kuma
+  #   restart: unless-stopped
+  #   ports:
+  #     - "3001:3001"
+  #   volumes:
+  #     - ./kuma-data:/app/data
+  #   mem_limit: 256m
+
+# 提示：
+# 1. 给 Docker 守护进程配日志轮转，防止根分区被日志撑满（图里根分区 80%）：
+#    /etc/docker/daemon.json
+#    { "log-driver": "json-file", "log-opts": { "max-size": "10m", "max-file": "3" } }
+#    然后 systemctl restart docker
+# 2. 定期 docker system prune -af --volumes（确认无用再删）回收空间

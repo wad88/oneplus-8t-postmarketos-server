@@ -1,0 +1,13 @@
+# ---------- /etc/systemd/system/hermes-monitor.timer ----------
+[Unit]
+Description=Run Hermes monitor every 30 min + 1 min after boot
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=30min
+# 错开整点，避免和别的定时任务撞
+RandomizedDelaySec=30
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,19 @@
+# Hermes 监控自启 —— cron 版（容器/环境没有 systemd 时用这个，例如纯 LXC 无 init、proot）
+# 安装：crontab -e 然后粘下面一行（每 30 分钟一次）
+#   */30 * * * * /opt/hermes/hermes-monitor.sh >/dev/null 2>&1
+#
+# 若环境连 cron 都没有（proot 常见），用一个常驻循环 + 放进 zellij/tmux 或 nohup：
+#   nohup /opt/hermes/hermes-loop.sh >/dev/null 2>&1 &
+
+# ---------- /opt/hermes/hermes-loop.sh ----------
+#!/usr/bin/env bash
+# 无 systemd/cron 时的兜底常驻循环
+set -u
+INTERVAL="${HERMES_INTERVAL:-1800}"   # 秒，默认 30 分钟
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# 启动后先等网络起来
+sleep 30
+while true; do
+  "$SELF_DIR/hermes-monitor.sh" || true
+  sleep "$INTERVAL"
+done
